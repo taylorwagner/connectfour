@@ -10,6 +10,7 @@ const HEIGHT = 6;
 
 let currPlayer = 1; // active player: 1 or 2
 const board = []; // array of rows, each row is array of cells  (board[y][x])
+let gameIsRunning = true;
 
 /** makeBoard: create in-JS board structure:
  *    board = array of rows, each row is array of cells  (board[y][x])
@@ -55,7 +56,12 @@ function makeHtmlBoard() {
 
 function findSpotForCol(x) {
   // TODO: write the real version of this, rather than always returning 0
-
+  for(let y = HEIGHT - 1; y >= 0; y--){
+    if(!board[y][x]){
+      return y;
+    }
+  }
+  return null;
 }
 
 /** placeInTable: update DOM to place piece into HTML table of board */
@@ -75,7 +81,9 @@ function placeInTable(y, x) {
 
 function endGame(msg) {
   // TODO: pop up alert message
+  setTimeout(function(){
   alert(msg);
+  }, 200);
 }
 
 /** handleClick: handle click of column top to play piece */
@@ -83,6 +91,10 @@ function endGame(msg) {
 function handleClick(evt) {
   // get x from ID of clicked cell
   let x = +evt.target.id;
+
+  if(gameIsRunning === false){
+    return;
+  }
 
   // get next spot in column (if none, ignore click)
   let y = findSpotForCol(x);
@@ -92,6 +104,7 @@ function handleClick(evt) {
 
   // place piece in board and add to HTML table
   // TODO: add line to update in-memory board
+  board[y][x] = currPlayer;
   placeInTable(y, x);
 
   // check for win
@@ -101,9 +114,21 @@ function handleClick(evt) {
 
   // check for tie
   // TODO: check if all cells in board are filled; if so call, call endGame
+  if(checkForTie()){
+    return endGame("It's a tie!");
+  }
 
   // switch players
   // TODO: switch currPlayer 1 <-> 2
+  switchCurrPlayer();
+}
+
+function checkForTie(){
+  return board.every(row=>row.every(intendedCell => intendedCell));
+}
+
+function switchCurrPlayer(){
+  return currPlayer = currPlayer === 1 ? 2 : 1;
 }
 
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
